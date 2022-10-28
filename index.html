@@ -28,11 +28,14 @@
       <!-- <a href="https://github.com/cpitclaudel/academic-poster-template"><img src="logo.svg" alt="Tutorial logo"></a> -->
     </aside>
     <div>
-      <h1 property="headline">Performance study of HEP data analysis tools</h1>
-      <h2 property="alternativeHeadline">
-        Project carried out at INFN-Sezione di Bari (June - August 2022) 
+      <h1 property="headline">A performance study of HEP data analysis tools</h1>
+      <!-- <h2 property="alternativeHeadline">
+        Project carried out at INFN-Sezione di Bari (June - August 2022)
         as part of the DOE-INFN Summer Exchange Program 2022
-      </h2>
+      </h2> -->
+      <!-- <h2 property="alternativeHeadline">
+        Parallel ROOT I/O with Uproot and RDataFrame
+      </h2> -->
       <address>
         <a property="author">Dung Hoang<sup>a</sup></a><a property="author">, Adriano Di Florio<sup>b, d</sup></a></a><a
           property="author">, Alexis Pompili<sup>b, c</sup></a></a><a property="author">, Umit Sozbilir<sup>b,
@@ -58,60 +61,63 @@
       </header>
 
       <p>
-        The Python programming language has an enormous and rapidly growing ecosystem that supports the analysis and
-        visualization of large datasets. Examples include Numpy (numerical computing), pandas (data manipulation),
-        matplotlib (visualization), and tensorflow (machine learning). With the huge amount of data that HEP experiments
-        produce, therefore, a complete HEP data analysis workflow in Python would provide great benefits. In this
-        project, we explored different approaches to process data stored in ROOT files using Python libraries and
-        frameworks. Specifically, we measured the performance of <strong>Uproot</strong>, a library for reading and
-        writing ROOT files in pure Python and Numpy, and the Pythonized version of <strong>RDataFrame</strong>, a
-        modern, high-level interface
-        for the analysis
-        of HEP data.
+        The Python programming language is currently characterized by an enormous and rapidly growing “ecosystem” of
+        software tools that support the analysis and visualization of “Big Data,” datasets that are too large or
+        complex to be dealt with by traditional data-processing methods. Examples include <a
+          href="https://numpy.org/">Numpy</a> (numerical
+        computing), <a href="https://pandas.pydata.org/">pandas</a> (data manipulation), <a
+          href="https://matplotlib.org/">matplotlib</a> (visualization), and <a
+          href="https://www.tensorflow.org/">tensorflow</a> (machine learning). With the huge and increasingly complex
+        volume of data that large-scale High Energy Physics (HEP) experiments
+        produce, a complete HEP
+        data analysis workflow can provide great benefits.
+      </p>
+      <p>
+        In this project, we explored different Python-based
+        approaches to deal with the
+        standard ROOT format common to all HEP data. With reference to a representative HEP workflow taken as use case,
+        we measured the performance of <strong><a href="https://uproot.readthedocs.io/en/latest/">Uproot</a></strong>, a
+        library for reading and writing ROOT
+        files in pure Python and NumPy, and of <strong><a
+            href="https://root.cern/doc/master/classROOT_1_1RDataFrame.html">RDataFrame</a></strong>, the modern ROOT's
+        high-level interface for efficient data
+        analysis. To match the performance of a traditional C++ ROOT workflow, we also adopted parallel processing in
+        our study.
       </p>
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Data</h3>
+        <h3>Data and computing resources</h3>
       </header>
-
       <p>
-        The ROOT files used in our measurements, which contain 457860912 events and take up more than 128GB of disk
-        space in total, were taken from CMS Run 2 dataset.
+        The ROOT files used in our study, which have a total size of about 128GB, were taken from CMS Open Data.
       </p>
-
-      <p>
-        For reasons that will be specified later, we split the original data set into 128 files with approximately the
-        same size.
-      </p>
-    </article>
-
-    <article property="abstract">
-      <header>
-        <h3>Computing resources</h3>
-      </header>
-
       <p>
         Measurements were run on three different machines on the ReCaS-Bari computing center:
       </p>
 
       <ol>
         <li>
-          <strong>wn-gpu-8-3-22</strong> (256 CPUs, 2003 GB RAM)
+          <strong>wn-gpu-8-3-22</strong> (256 CPUs, ~2000 GB RAM)
         </li>
         <li>
-          <strong>wn-1-8-9</strong> (64 CPUs, 251GB RAM)
+          <strong>wn-1-8-9</strong> (64 CPUs, ~250GB RAM)
         </li>
         <li>
-          <strong>tesla04</strong> (32 CPUs, 251 GB RAM)
+          <strong>tesla04</strong> (32 CPUs, ~250 GB RAM)
         </li>
       </ol>
 
       <p>
         For the first two machines, data could only be stored remotely on the computing cluster, while on
         <strong>tesla04</strong>, it
-        was also possible to access the data on the local disk.
+        was possible to access the data on the local disk.
+      </p>
+      <p>
+        <strong>tesla04</strong> was also the only computer on which we could install the latest version of ROOT (6.26).
+        To make fair comparison between different computers, therefore, all measurements were run with ROOT 6.24 unless
+        otherwise specified.
       </p>
 
     </article>
@@ -122,70 +128,84 @@
       </header>
 
       <p>
-        With Uproot and RDataFrame, we measured the total runtime of the following operations:
-      </p>
-
+        Specifically we measure the total runtime of the sequence of the following operations:
       <ol>
-        <li>
-          Accessing the TTree’s in the ROOT files.
+        <li> accessing the TTree inside the input ROOT files; </li>
+        <li> applying specific filters (selection criteria) on the variables stored in the TTree, in order to extract a
+          known physical signal associated to the decay chain of a beauty meson (B0s → J/psi phi, J/psi→mumu, phi→KK);
         </li>
-        <li>
-          Applying specific filters (selection criteria) on the data to expose the signal of the B0s meson decaying into
-          the J/psi meson (decaying into two muons) and the Phi meson (decaying into two tracks with Kaon mass
-          assigned).
-        </li>
-        <li>
-          Converting the TBranch containing the mass to a NumPy array.
-        </li>
+        <li> converting the TBranch containing the selected invariant mass to a NumPy array for further analysis task
+          (signal fitting, etc ...). </li>
       </ol>
-
-    </article>
-
-    <article property="abstract">
-      <header>
-        <h3>Analysis task</h3>
-      </header>
-
+      </p>
 
       <figure>
-        <img src="plots/dist1.png">
+        <img src="plots/dist1.png" style="width:90%">
       </figure>
       <figure>
-        <img src="plots/dist2.png">
+        <img src="plots/dist2.png" style="width:90%">
       </figure>
 
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Setup</h3>
+        <h3>Parallel processing</h3>
       </header>
 
       <p>
-        To take advantage of our multi-core computers, we adopted parallel processing in our measurement. In other
-        words, instead of letting one CPU handle the whole dataset, we used multiple CPUs running in parallel to process
-        pieces of data concurrently.
+        Instead of letting one CPU handle the whole dataset, we used multiple CPUs running in parallel to process pieces
+        of data concurrently.
+      </p>
+      <p>
+        Without parallelism, the time it takes to complete the analysis task would be:
+      </p>
+
+      \[T = t_u\cdot S\]
+
+      <p>
+        Where T is the total run time, t<sub>u</sub> is the time to process one unit of data, and S is the size of data.
+      </p>
+
+      <p>
+        By implementing parallel processing, this equation becomes:
+      </p>
+
+      \[ T = C(S, P) + t_u\cdot \lceil{S \over P}\rceil \]
+
+      <p>
+        Where C(S, P) is the time to access/split/merge the data and P is the number of concurrent processes. The
+        fraction
+        S/P is rounded up to make sure that no data is lost.
       </p>
 
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Uproot</h3>
+        <h3>Parallel processing with Uproot</h3>
       </header>
 
       <p>
-        With Uproot, there isn’t a built-in option for implicit parallel processing. To enable parallelism, therefore,
-        we manually created subprocesses with Python’s multiprocessing module. Since Uproot allows users to specify the
-        number of events to be processed in each TTree, the smallest unit of data distributed to each subprocess is one
-        event. As a result, the workload can always be divided equally among subprocesses.
+        Uproot does not provide a built-in option for implicit parallel processing. To enable parallelism, therefore,
+        we manually split the data into smaller chunks and then created subprocesses with Python’s multiprocessing
+        module to handle them. Since Uproot allows users to specify the number of events to be processed in each TTree,
+        the smallest unit of data assigned to each subprocess is one event. As a result, data can be distributed
+        very evenly among subprocesses, and the runtime function for Uproot would be:
+      </p>
+
+      \[ T = C(S, P) + t_e\cdot \lceil{S_e \over P}\rceil \]
+
+      <p>
+        Where t<sub>e</sub> is the time to process one <strong>event</strong>, and S<sub>e</sub> is number of
+        <strong>events</strong> in the dataset.
       </p>
 
     </article>
 
     <article property="abstract">
       <header>
-        <h3>RDataFrame</h3>
+        <h3>Parallel processing with RDataFrame</h3>
       </header>
 
       <p>
@@ -207,7 +227,7 @@
 
     <article property="abstract">
       <header>
-        <h3>RDataFrame</h3>
+        <h3>Parallel processing with RDataFrame </h3>
       </header>
 
       <p>
@@ -215,22 +235,54 @@
         of data. Unlike Uproot,
         RDataFrame doesn’t provide the option to specify the number of events to be processed in each file, so the
         smallest unit of data distributed to each subprocess is one
-        file. As a result, each subprocess will work on
-        approximately the same number of files rather than the same number of events.
+        file. As a result, the runtime function for RDataFrame would be:
+      </p>
+
+      \[ T = C(S, P) + t_f\cdot \lceil{S_f \over P}\rceil \]
+
+      <p>
+        Where t<sub>f</sub> is the time to process one <strong>ROOT file</strong>, and S<sub>f</sub> is number of
+        <strong>ROOT files</strong> in the dataset.
       </p>
 
       <p>
-        To make it easier to distribute data evenly with RDataFrame, we split – by using Uproot – the original dataset
-        into 128 files, each containing the
-        same number of events. For a fair comparison, we used these files as input for both Uproot and RDataFrame.
+        If the files had different sizes, t<sub>f</sub> would vary, making it difficult to understand the performance of
+        RDataFrame. To prevent this, therefore, we split the original dataset
+        into 128 files of the same size. For a fair comparison, we used these files as input for both Uproot and
+        RDataFrame.
       </p>
 
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Results</h3>
+        <h3>Results - Local and remote access</h3>
       </header>
+
+      <figure>
+        <img src="plots/localvsremote1.png">
+      </figure>
+      <figure>
+        <img src="plots/localvsremote2.png">
+      </figure>
+
+      <p>
+        We found that accessing the data on local disk resulted in an insignificant increase in
+        performance. In all subsequent measurements, therefore, data were always accessed remotely.
+      </p>
+
+    </article>
+
+    <article property="abstract">
+      <header>
+        <h3>Results - Runtime vs Processes</h3>
+      </header>
+
+      <p>
+        By keeping the size of data constant (128 files/128GB/4.5 &#183; 10<sup>8</sup> events) and varying the number
+        of processes (at 1 process, there is no parallelism), we
+        obtained the following results:
+      </p>
 
       <figure>
         <img src="plots/rvp1.png">
@@ -242,13 +294,26 @@
         <img src="plots/rvp3.png">
       </figure>
 
+      <p>
+        The plots, which show that runtime is inversely proportional to the number of process, are consistent with the
+        runtime functions mentioned above, as we found in other tests that the time C(S, P) is constant. While the
+        curves of Uproot
+        are fairly
+        smooth, we can see a discrete pattern in RDataFrame's plots. This reflects the fact that RDataFrame's smallest
+        unit of data is one file, which is much greater than Uproot's smallest unit of data (one event).
+      </p>
+
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Results</h3>
+        <h3>Results - Speed-up vs Processes</h3>
       </header>
-
+      <p>
+        From the previous plots, we can calculate how much speed-up we gained by using parallel processing. Speed-up at
+        n
+        processes is the ratio between the runtime at 1 process and the runtime at n processes.
+      </p>
       <figure>
         <img src="plots/svp1.png">
       </figure>
@@ -259,13 +324,34 @@
         <img src="plots/svp3.png">
       </figure>
 
+      <p>
+        From the plots, it can be observed that we gained a significant performance boost with both Uproot and
+        RDataFrame by implementing parallel processing. On the machine wn-gpu-8-3-22, for instance, Uproot with
+        multiprocessing could be almost 9 times faster than normal. In the case of RDataFrame, we achieved an even more
+        striking speed-up: at 128 subprocesses, it was over 50 times faster than without parallelism.
+      </p>
+
+      <p>
+        Expectedly, we didn’t gain anything when we
+        created more subprocesses than the number of CPUs on the machine. This was clearly visible on wn-1-8-9 and
+        tesla04, which have 64 and 32 CPUs, respectively. With Uproot, however, the performance boost peaked at around
+        32 processes, no matter how many CPUs we had. This was because for Uproot, C(S, P) was large, and as a result,
+        it
+        dominated the speed-up gained by creating
+        more processes. In the case of RDataFrame, C(S, P) is relatively insignificant, so we gained performance boost
+        until the maximum number of CPUs is reached.
+      </p>
     </article>
 
     <article property="abstract">
       <header>
-        <h3>Results</h3>
+        <h3>Results - Runtime vs Size</h3>
       </header>
-
+      <p>
+        By keeping the number
+        of processes constant (at 32 or 64) and varying the size of data, we
+        obtained the following results:
+      </p>
       <figure>
         <img src="plots/rvs1.png">
       </figure>
@@ -276,19 +362,11 @@
         <img src="plots/rvs3.png">
       </figure>
 
-    </article>
-
-    <article property="abstract">
-      <header>
-        <h3>Results</h3>
-      </header>
-
-      <figure>
-        <img src="plots/localvsremote1.png">
-      </figure>
-      <figure>
-        <img src="plots/localvsremote2.png">
-      </figure>
+      <p>
+        The plots show that the total runtime is linearly proportional to the size of data, which is what we expected.
+        In RDataFrame's curves, a step-like pattern is observed, which again reflects that with our approach, RDataFrame
+        parallelized over files instead of events.
+      </p>
 
     </article>
 
@@ -314,16 +392,25 @@
     </figure> -->
   </main>
 
-  <!-- <footer>
-    <address class="monospace"> <a
-        href="https://github.com/cpitclaudel/academic-poster-template">https://github.com/cpitclaudel/academic-poster-template</a>
+  <footer>
+    <address class="monospace">
+      hoadh-23@rhodes.edu
     </address>
-    <address class="monospace"> clement.pitclaudel@live.com
+    <address class="monospace">
+      adriano.diflorio@ba.infn.it
     </address>
-    <span class="credits">
-      Based on an <a href="https://github.com/cpitclaudel/academic-poster-template">open poster template</a>.
-    </span>
-  </footer> -->
+    <address class="monospace">
+      alexis.pompili@ba.infn.it
+    </address>
+    <address class="monospace">
+      umit.sozbilir@cern.ch
+    </address>
+    <address class="monospace">
+      vin.mas21@gmail.com
+    </address>
+    <!-- <span class="credits">
+    </span> -->
+  </footer>
 </body>
 
 </html>
